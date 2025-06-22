@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+    <head>
+        <title>超讚ㄉ短網址</title>
+        <meta name="robots" content="index, nofollow" />
+
+        <meta name="title" content="超讚ㄉ短網址" />
+        <meta name="description" content="超讚ㄉ短網址" />
+
+        <meta name="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="auhtor" content="猫又おにぎり (https://haer0248.me/)" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+
+        <link href="https://image.haer0248.me/avatar/face-64.png" rel="icon" type="image/x-icon" />
+        <link href="/assets/styles.css" rel="stylesheet" />
+
+        <link rel="stylesheet" href="/assets/toast.css">
+        <script src="/assets/toast.js"></script>
+    </head>
+
+    <body id="dashboard-content" class="dark bg-gray-900 min-h-screen text-white">
+        <header id="header-section" class="hidden bg-gray-800 border-b border-gray-700 sticky top-0 z-50 shadow-lg">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-16">
+
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+                            </svg>
+                        </div>
+                        <h1 class="text-xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                            超讚ㄉ短網址
+                        </h1>
+                    </div>
+
+                    <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold" id="user-avatar">
+                            </div>
+                            <div class="hidden sm:block">
+                                <p class="text-sm font-medium text-white mb-0" id="user-global-name"></p>
+                                <p class="text-sm font-medium text-gray-500" id="user-name"></p>
+                            </div>
+                        </div>
+                        <button onclick="logout()" class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-red-400 bg-red-900/20 border border-red-800 rounded-lg hover:bg-red-900/30 transition-colors duration-200">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                            </svg>
+                            <span class="hidden sm:inline">登出</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main id="dashboard-section" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="mb-3">
+                <a href="/dashboard" class="hover:text-gray-100 transition-colors duration-200 inline-flex items-center px-4 py-2 text-gray-400 font-semibold rounded-lg">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                    </svg>
+                    返回儀表板
+                </a>
+            </div>
+
+            <div class="bg-gray-800 rounded-2xl shadow-xl border border-gray-700 mb-8 animate-fade-in">
+                <div class="px-6 py-4 border-b border-gray-700 bg-gray-800/50">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center">
+                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                </svg>
+                            </div>
+                            <h3 class="text-xl font-bold text-white">網址點擊分析</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="link-info-section" class="space-y-6 px-6 py-4"></div>
+            </div>
+
+            <div class="bg-gray-800 rounded-2xl shadow-xl border border-gray-700 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-700/50">
+                            <tr>
+                                <th class="px-6 py-4 text-left text-sm font-medium text-gray-400 uppercase tracking-wide">IP</th>
+                                <th class="px-6 py-4 text-left text-sm font-medium text-gray-400 uppercase tracking-wide">TIME</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-700" id="analyticsTableBody">
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="flex items-center justify-center py-12 hidden" id="empty-state">
+                    <div class="text-center">
+                        <div class="w-16 h-16 mx-auto mb-4 bg-gray-700 rounded-full flex items-center justify-center">
+                            <svg class="w-8 h-8 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-medium text-white mb-2">沒有分析資料</h3>
+                        <p class="text-gray-400">這個超讚ㄉ短網址似乎還沒被使用過</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <script>
+            const body = document.getElementById('dashboard-content');
+            const headerArea = document.getElementById('header-section');
+            const dashboardArea = document.getElementById('dashboard-section');
+
+            let currentUser = null;
+            let currentLink = null;
+            let analyticsData = [];
+
+            async function init() {
+                try {
+                    await loadUser();
+                    await loadLinkData();
+                } catch (error) {
+                    console.error('Initialization error:', error);
+                    location.href = '/dashboard';
+                }
+            }
+
+            async function loadUser() {
+                const response = await fetch('/api/user');
+                if (!response.ok) {
+                    location.href = '/dashboard';
+                    throw new Error('使用者讀取失敗，尚未登入');
+                }
+
+                currentUser = await response.json();
+                body.className = 'dark bg-gray-900 min-h-screen text-white';
+
+                document.getElementById('user-global-name').textContent = currentUser.globalName;
+                document.getElementById('user-name').textContent = currentUser.username;
+                const avatar = document.getElementById('user-avatar');
+                if (currentUser.avatar) {
+                    avatar.innerHTML = `<img src="https://cdn.discordapp.com/avatars/${currentUser.discordId}/${currentUser.avatar}.png" alt="${currentUser.globalName.charAt(0).toUpperCase()}" class="w-full h-full rounded-full object-cover">`;
+                } else {
+                    avatar.textContent = currentUser.globalName.charAt(0).toUpperCase();
+                }
+            }
+
+            async function loadLinkData() {
+                try {
+                    const response = await fetch(`/api/analytics/{{UNIQUE_LINK_ID}}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    if (!response.ok) {
+                        location.href = '/dashboard';
+                        showToast('error', '短網址不存在')
+                        dashboardArea.style.display = 'none';
+                        throw new Error('短網址不存在');
+                    }
+                    headerArea.style.display = 'block';
+                    dashboardArea.style.display = 'block';
+
+                    currentLink = await response.json();
+                    renderLinkInfo();
+                    loadAnalyticsData();
+                } catch (error) {
+                    console.error('Failed to load link:', error);
+                }
+            }
+
+            function renderLinkInfo() {
+                if (!currentLink) return;
+                linkInfo = currentLink.link;
+
+                const linkInfoSection = document.getElementById('link-info-section');
+                linkInfoSection.innerHTML = `
+                    <div class="flex items-center gap-4 mb-3">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${linkInfo.enabled ? 'bg-emerald-900/30 text-emerald-300 border border-emerald-700' : 'bg-red-900/30 text-red-300 border border-red-700'}">
+                            ${linkInfo.enabled ? 'Enable' : 'Disabled'}
+                        </span>
+                        <h3 class="text-xl font-bold text-white">${linkInfo.shortCode}</h3>
+                    </div>
+                    
+                    <div class="space-y-3">                        
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm text-gray-400 w-40">自訂網址：</span>
+                            <a href="/${linkInfo.shortCode}" target="_blank" 
+                                class="text-purple-400 hover:text-purple-300 font-medium text-sm flex items-center gap-1 group">
+                                ${(window.location.origin).replace('https://', '')}/${linkInfo.shortCode}
+                                <svg class="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                                </svg>
+                            </a>
+                        </div>
+                        
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm text-gray-400 w-40">目標網址：</span>
+                            <span class="text-sm text-gray-300 truncate spoiler-blur" onclick="toggleBlur(this)">${(linkInfo.originalUrl).replace('https://', '')}</span>
+                        </div>
+                        
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm text-gray-400 w-40">建立時間：</span>
+                            <span class="text-sm text-gray-300">${new Date(linkInfo.createdAt).toLocaleString('zh-TW', { hour12: false })}</span>
+                        </div>
+                        
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm text-gray-400 w-40">總點擊次數：</span>
+                            <span class="text-sm text-gray-300" id="total-clicks"></span>
+                        </div>
+                        
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm text-gray-400 w-40">不重複點擊次數：</span>
+                            <span class="text-sm text-gray-300" id="unique-ip"></span>
+                        </div>
+                    </div>
+                `;
+
+            }
+
+            async function loadAnalyticsData() {
+                try {
+                    analyticsData = currentLink.click;
+                    const clicks = (currentLink.click.length ?? 0);
+                    const uniqueIPs = (new Set(analyticsData.map(entry => entry.accessIp)).size ?? 0);
+                    document.getElementById('total-clicks').textContent = (clicks).toLocaleString('zh-TW');
+                    document.getElementById('unique-ip').textContent = (uniqueIPs).toLocaleString('zh-TW');
+
+                    if (analyticsData.length === 0) {
+                        document.getElementById('empty-state').classList.remove('hidden');
+                        return;
+                    }
+                    
+                    const tableBody = document.getElementById('analyticsTableBody');
+                    tableBody.innerHTML = analyticsData.map(entry => `
+                        <tr class="hover:bg-gray-700/30 transition-colors duration-200">
+                            <td class="px-6 py-4 text-sm text-gray-300">${entry.accessIp}</td>
+                            <td class="px-6 py-4 text-sm text-gray-300">${new Date(entry.accessTime).toLocaleString('zh-TW', { hour12: false })}</td>
+                        </tr>`).join('');
+
+
+                    if (analyticsData.length > 0) {
+                        const lastAccess = analyticsData[0].timestamp;
+                    }
+                } catch (error) {
+                    showToast('error', '讀取分析資料時發生錯誤')
+                    console.error('Failed to load analytics:', error);
+                    document.getElementById('empty-state').classList.remove('hidden');
+                }
+            }
+
+            async function logout() {
+                try {
+                    await fetch('/auth/logout', { method: 'POST' });
+                    window.location.href = '/dashboard?message=logout';
+                } catch (error) {
+                    console.error('Logout error:', error);
+                    window.location.href = '/dashboard?message=error';
+                }
+            }
+
+            function toggleBlur(element) {
+                element.classList.toggle('revealed')
+            }
+
+            document.addEventListener('DOMContentLoaded', init);
+        </script>
+    </body>
+
+</html>
