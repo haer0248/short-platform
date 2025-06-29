@@ -25,10 +25,6 @@ const linkSchema = new mongoose.Schema({
         type: Boolean,
         default: true
     },
-    clicks: {
-        type: Number,
-        default: 0
-    },
     createdAt: {
         type: Date,
         default: Date.now
@@ -38,5 +34,15 @@ const linkSchema = new mongoose.Schema({
 
 // Compound index for user's links
 linkSchema.index({ userId: 1, createdAt: -1 });
+
+linkSchema.virtual('totalClicks', {
+    ref: 'Clicks',
+    localField: '_id',
+    foreignField: 'shortId',
+    count: true
+});
+
+linkSchema.set('toJSON', { virtuals: true });
+linkSchema.set('toObject', { virtuals: true });
 
 module.exports = mongoose.model('Link', linkSchema);

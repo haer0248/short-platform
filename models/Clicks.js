@@ -14,6 +14,14 @@ const clickSchema = new mongoose.Schema({
     userAgent: {
         type: String,
         default: ''
+    },
+    userMethod: {
+        type: Object,
+        default: ''
+    },
+    userReferer: {
+        type: String,
+        default: ''
     }
 });
 

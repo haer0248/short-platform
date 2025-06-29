@@ -11,7 +11,9 @@ router.get('/user', requireAuth, (req, res) => {
 
 router.get('/links', requireAuth, async (req, res) => {
     try {
-        const links = await Link.find({ userId: req.session.user.id }).sort({ createdAt: -1 });
+        const links = await Link.find({ userId: req.session.user.id })
+            .sort({ createdAt: -1 })
+            .populate('totalClicks');;
         res.json(links);
     } catch (error) {
         console.error('Fetch links error:', error);
@@ -22,7 +24,7 @@ router.get('/links', requireAuth, async (req, res) => {
 router.post('/analytics/:id', requireAuth, async (req, res) => {
     try {
         const links = await Link.findOne({ _id: req.params.id, userId: req.session.user.id });
-        const clicks = await Clicks.find({ shortId: links.id });
+        const clicks = await Clicks.find({ shortId: links.id }).sort({ accessTime: 'desc' });
 
         res.json({
             link: links,

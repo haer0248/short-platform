@@ -88,7 +88,8 @@
                         <thead class="bg-gray-700/50">
                             <tr>
                                 <th class="px-6 py-4 text-left text-sm font-medium text-gray-400 uppercase tracking-wide">IP</th>
-                                <th class="px-6 py-4 text-left text-sm font-medium text-gray-400 uppercase tracking-wide">TIME</th>
+                                <th class="px-6 py-4 text-left text-sm font-medium text-gray-400 uppercase tracking-wide">Time</th>
+                                <th class="px-6 py-4 text-left text-sm font-medium text-gray-400 uppercase tracking-wide">來源</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-700" id="analyticsTableBody">
@@ -235,14 +236,14 @@
                         document.getElementById('empty-state').classList.remove('hidden');
                         return;
                     }
-                    
+
                     const tableBody = document.getElementById('analyticsTableBody');
                     tableBody.innerHTML = analyticsData.map(entry => `
                         <tr class="hover:bg-gray-700/30 transition-colors duration-200">
                             <td class="px-6 py-4 text-sm text-gray-300">${entry.accessIp}</td>
                             <td class="px-6 py-4 text-sm text-gray-300">${new Date(entry.accessTime).toLocaleString('zh-TW', { hour12: false })}</td>
+                            <td class="px-6 py-4 text-sm text-gray-300">${entry.userMethod ? entry.userMethod : '直接點擊'}</td>
                         </tr>`).join('');
-
 
                     if (analyticsData.length > 0) {
                         const lastAccess = analyticsData[0].timestamp;
