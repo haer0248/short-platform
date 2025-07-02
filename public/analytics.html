@@ -90,9 +90,10 @@
                                 <th class="px-6 py-4 text-left text-sm font-medium text-gray-400 uppercase tracking-wide">IP</th>
                                 <th class="px-6 py-4 text-left text-sm font-medium text-gray-400 uppercase tracking-wide">Time</th>
                                 <th class="px-6 py-4 text-left text-sm font-medium text-gray-400 uppercase tracking-wide">來源</th>
+                                <th class="px-6 py-4 text-left text-sm font-medium text-gray-400 uppercase tracking-wide">裝置</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-700" id="analyticsTableBody">
+                        <tbody class="divide-y divide-gray-700" id="analytics-table-body">
                         </tbody>
                     </table>
                 </div>
@@ -115,6 +116,7 @@
             const body = document.getElementById('dashboard-content');
             const headerArea = document.getElementById('header-section');
             const dashboardArea = document.getElementById('dashboard-section');
+            const linkId = '{{UNIQUE_LINK_ID}}';
 
             let currentUser = null;
             let currentLink = null;
@@ -152,7 +154,7 @@
 
             async function loadLinkData() {
                 try {
-                    const response = await fetch(`/api/analytics/{{UNIQUE_LINK_ID}}`, {
+                    const response = await fetch(`/api/analytics/${linkId}`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
@@ -211,13 +213,18 @@
                         </div>
                         
                         <div class="flex items-center gap-2">
-                            <span class="text-sm text-gray-400 w-40">總點擊次數：</span>
+                            <span class="text-sm text-gray-400 w-40">總瀏覽次數：</span>
                             <span class="text-sm text-gray-300" id="total-clicks"></span>
                         </div>
                         
                         <div class="flex items-center gap-2">
-                            <span class="text-sm text-gray-400 w-40">不重複點擊次數：</span>
+                            <span class="text-sm text-gray-400 w-40">不重複瀏覽次數：</span>
                             <span class="text-sm text-gray-300" id="unique-ip"></span>
+                        </div>
+                        
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm text-gray-400 w-40">非機器人瀏覽次數：</span>
+                            <span class="text-sm text-gray-300" id="total-nonbot-clicks"></span>
                         </div>
                     </div>
                 `;
@@ -225,34 +232,61 @@
             }
 
             async function loadAnalyticsData() {
+                if (!linkId) return;
+
                 try {
-                    analyticsData = currentLink.click;
-                    const clicks = (currentLink.click.length ?? 0);
-                    const uniqueIPs = (new Set(analyticsData.map(entry => entry.accessIp)).size ?? 0);
-                    document.getElementById('total-clicks').textContent = (clicks).toLocaleString('zh-TW');
-                    document.getElementById('unique-ip').textContent = (uniqueIPs).toLocaleString('zh-TW');
+                    analyticsData = currentLink.click || [];
 
-                    if (analyticsData.length === 0) {
-                        document.getElementById('empty-state').classList.remove('hidden');
-                        return;
-                    }
+                    const totalClicks = analyticsData.length;
+                    const nonBotClicks = analyticsData.filter(entry => !isBot(entry.userAgent));
+                    const uniqueIPs = new Set(analyticsData.map(entry => entry.accessIp)).size;
 
-                    const tableBody = document.getElementById('analyticsTableBody');
-                    tableBody.innerHTML = analyticsData.map(entry => `
+                    document.getElementById('total-clicks').textContent = totalClicks.toLocaleString('zh-TW');
+                    document.getElementById('total-nonbot-clicks').textContent = nonBotClicks.length.toLocaleString('zh-TW');
+                    document.getElementById('unique-ip').textContent = uniqueIPs.toLocaleString('zh-TW');
+
+                    renderAnalyticsTable();
+
+                } catch (error) {
+                    console.error('Failed to load analytics:', error);
+                }
+            }
+
+            function renderAnalyticsTable() {
+                const tableBody = document.getElementById('analytics-table-body');
+
+                if (analyticsData.length === 0) {
+                    document.getElementById('empty-state').classList.remove('hidden');
+                    return;
+                }
+
+                document.getElementById('empty-state').classList.add('hidden');
+
+                tableBody.innerHTML = analyticsData.map(entry => {
+                    const isBotAccess = isBot(entry.userAgent);
+                    const botType = isBotAccess ? getBotType(entry.userAgent) : '訪客操作';
+                    const typeClass = isBotAccess ? 'text-orange-400' : 'text-emerald-400';
+
+                    return `
                         <tr class="hover:bg-gray-700/30 transition-colors duration-200">
                             <td class="px-6 py-4 text-sm text-gray-300">${entry.accessIp}</td>
                             <td class="px-6 py-4 text-sm text-gray-300">${new Date(entry.accessTime).toLocaleString('zh-TW', { hour12: false })}</td>
-                            <td class="px-6 py-4 text-sm text-gray-300">${entry.userMethod ? entry.userMethod : '直接點擊'}</td>
-                        </tr>`).join('');
-
-                    if (analyticsData.length > 0) {
-                        const lastAccess = analyticsData[0].timestamp;
-                    }
-                } catch (error) {
-                    showToast('error', '讀取分析資料時發生錯誤')
-                    console.error('Failed to load analytics:', error);
-                    document.getElementById('empty-state').classList.remove('hidden');
-                }
+                            <td class="px-6 py-4 text-sm text-gray-300">${entry.userMethod || '直接瀏覽'}</td>
+                            <td class="px-6 py-4 text-sm ${typeClass}" title="${entry.userAgent}">
+                                <span class="inline-flex items-center gap-1">
+                                    ${isBotAccess ?
+                            `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                        </svg>` :
+                            `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                        </svg>`
+                        }
+                                    ${botType}
+                                </span>
+                            </td>
+                        </tr>`;
+                }).join('');
             }
 
             async function logout() {
@@ -270,6 +304,49 @@
             }
 
             document.addEventListener('DOMContentLoaded', init);
+
+            function isBot(userAgent) {
+                if (!userAgent) return false;
+
+                const botPatterns = [/googlebot/i, /bingbot/i, /slurp/i, /duckduckbot/i, /baiduspider/i, /yandexbot/i, /facebookexternalhit/i, /twitterbot/i, /linkedinbot/i, /whatsapp/i, /telegrambot/i, /ahrefsbot/i, /semrushbot/i, /mj12bot/i, /dotbot/i, /screaming frog/i, /sitemap/i, /bot\b/i, /crawler/i, /spider/i, /scraper/i, /wget/i, /curl/i, /python/i, /java/i, /go-http-client/i, /okhttp/i, /apache-httpclient/i, /postman/i, /insomnia/i, /uptimerobot/i, /pingdom/i, /newrelic/i, /datadog/i, /statuspage/i, /nmap/i, /masscan/i, /zmap/i, /nuclei/i, /acunetix/i, /burp/i, /sqlmap/i, /headless/i, /phantom/i, /selenium/i, /webdriver/i, /automation/i, /test/i];
+
+                return botPatterns.some(pattern => pattern.test(userAgent));
+            }
+
+            function getBotType(userAgent) {
+                if (!userAgent) return 'Unknown';
+
+                const userAgentLower = userAgent.toLowerCase();
+
+                if (userAgentLower.includes('googlebot')) return 'Google Bot';
+                if (userAgentLower.includes('bingbot')) return 'Bing Bot';
+                if (userAgentLower.includes('slurp')) return 'Yahoo Bot';
+                if (userAgentLower.includes('duckduckbot')) return 'DuckDuckGo Bot';
+                if (userAgentLower.includes('baiduspider')) return 'Baidu Bot';
+                if (userAgentLower.includes('yandexbot')) return 'Yandex Bot';
+                if (userAgentLower.includes('facebookexternalhit')) return 'Facebook Bot';
+                if (userAgentLower.includes('twitterbot')) return 'Twitter Bot';
+                if (userAgentLower.includes('linkedinbot')) return 'LinkedIn Bot';
+                if (userAgentLower.includes('whatsapp')) return 'WhatsApp Bot';
+                if (userAgentLower.includes('telegrambot')) return 'Telegram Bot';
+                if (userAgentLower.includes('ahrefsbot')) return 'Ahrefs Bot';
+                if (userAgentLower.includes('semrushbot')) return 'SEMrush Bot';
+                if (userAgentLower.includes('screaming frog')) return 'Screaming Frog';
+                if (userAgentLower.includes('uptimerobot')) return 'UptimeRobot';
+                if (userAgentLower.includes('pingdom')) return 'Pingdom';
+                if (userAgentLower.includes('curl')) return 'cURL';
+                if (userAgentLower.includes('wget')) return 'Wget';
+                if (userAgentLower.includes('python')) return 'Python Script';
+                if (userAgentLower.includes('postman')) return 'Postman';
+                if (userAgentLower.includes('insomnia')) return 'Insomnia';
+
+                if (/bot\b/i.test(userAgent)) return 'Bot';
+                if (/crawler/i.test(userAgent)) return 'Crawler';
+                if (/spider/i.test(userAgent)) return 'Spider';
+                if (/scraper/i.test(userAgent)) return 'Scraper';
+
+                return 'Unknown Bot';
+            }
         </script>
     </body>
 
